@@ -13,6 +13,7 @@ services:
         published: 443
         mode: host
     volumes:
+      - cache-vol:/var/nginx/cache
       - acme-vol:/var/www/html
     secrets:
       - source: cert-chain
@@ -47,6 +48,9 @@ networks:
     external: true
 
 volumes:
+  cache-vol:
+    name: cache-vol
+
   acme-vol:
     name: acme-vol
 
