@@ -26,9 +26,7 @@ services:
       - source: cert-privkey
         target: /etc/nginx/certs/privkey.pem
     healthcheck:
-      test: >
-        wget --spider -S -t 3 http://${PUBLIC_HOSTNAME:-localhost} ||
-        count=$$(ps aux | grep openssl | wc -l); [ $${count} -gt 1 ]
+      test: wget --spider -S -t 3 http://${PUBLIC_HOSTNAME:-localhost} || count=$$(ps aux | grep openssl | wc -l); [ $${count} -gt 1 ]
       interval: 30s
       timeout: 10s
       retries: 3
