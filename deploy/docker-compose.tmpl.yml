@@ -3,6 +3,8 @@ version: '3.5'
 services:
   nginx-proxy:
     image: ${IMAGE_NAME}:${IMAGE_TAG:-latest}
+    environment:
+      - PERSISTENT_PATH
     networks:
       - traefik-net
     ports:
@@ -13,6 +15,7 @@ services:
         published: 443
         mode: host
     volumes:
+      - persistent-vol:${PERSISTENT_PATH}
       - cache-vol:/var/nginx/cache
       - acme-vol:/var/www/html
     secrets:
@@ -22,8 +25,6 @@ services:
         target: /etc/nginx/certs/fullchain.pem
       - source: cert-privkey
         target: /etc/nginx/certs/privkey.pem
-      - source: cert-dhparam
-        target: /etc/nginx/certs/dhparam.pem
     healthcheck:
       test: wget --spider -S -t 3 http://${PUBLIC_HOSTNAME:-localhost}
       interval: 30s
@@ -38,7 +39,7 @@ services:
         window: 2m
       resources:
         limits:
-          cpus: '4'
+          cpus: '2'
           memory: 128M
         reservations:
           memory: 103M
@@ -49,7 +50,10 @@ networks:
 
 volumes:
   cache-vol:
-    name: cache-vol
+    name: nginx-cache-vol
+
+  persistent-vol:
+    name: nginx-persistent-vol
 
   acme-vol:
     name: acme-vol
@@ -62,7 +66,4 @@ secrets:
     external: true
 
   cert-privkey:
-    external: true
-
-  cert-dhparam:
     external: true
