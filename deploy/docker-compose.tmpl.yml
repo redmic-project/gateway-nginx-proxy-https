@@ -18,6 +18,11 @@ services:
       - persistent-vol:${PERSISTENT_PATH}
       - cache-vol:/var/nginx/cache
       - acme-vol:/var/www/html
+    configs:
+      - source: blockips
+        target: /etc/nginx/conf.d/blockips.conf
+      - source: blacklist
+        target: /etc/nginx/conf.d/blacklist.conf
     secrets:
       - source: cert-chain
         target: /etc/nginx/certs/chain.pem
@@ -60,6 +65,10 @@ volumes:
 
   acme-vol:
     name: acme-vol
+
+configs:
+  blockips:
+    file: ./config/blockips.conf
 
 secrets:
   cert-chain:
