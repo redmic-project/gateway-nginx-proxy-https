@@ -31,7 +31,7 @@ services:
       - source: cert-privkey
         target: /etc/nginx/certs/privkey.pem
     healthcheck:
-      test: wget --spider -S -t 3 http://${PUBLIC_HOSTNAME:-localhost} || (count=$$(ps aux | grep openssl | wc -l); [ $${count} -gt 1 ])
+      test: wget --spider http://${PUBLIC_HOSTNAME:-localhost} || (count=$$(ps aux | grep openssl | wc -l); [ $${count} -gt 1 ])
       interval: 30s
       timeout: 10s
       retries: 3
@@ -43,39 +43,44 @@ services:
         constraints:
           - node.role == manager
       restart_policy:
-        delay: 30s
-        window: 2m
+        delay: 10s
+        window: 1m
       resources:
         limits:
           cpus: '2'
           memory: 128M
         reservations:
-          memory: 103M
+          memory: 64M
 
 networks:
   traefik-net:
+    name: ${TRAEFIK_NET_NAME:-traefik-net}
     external: true
 
 volumes:
   cache-vol:
-    name: nginx-cache-vol
+    name: ${CACHE_VOL_NAME:-nginx-cache-vol}
 
   persistent-vol:
-    name: nginx-persistent-vol
+    name: ${PERSISTENT_VOL_NAME:-nginx-persistent-vol}
 
   acme-vol:
-    name: acme-vol
+    name: ${ACME_VOL_NAME:-acme-vol}
 
 configs:
   blockips:
+    name: ${BLOCKLIPS_NAME:-nginx-blockips}
     file: ./config/blockips.conf
 
 secrets:
   cert-chain:
+    name: ${CERT_CHAIN_NAME:-cert-chain}
     external: true
 
   cert-fullchain:
+    name: ${CERT_FULLCHAIN_NAME:-cert-fullchain}
     external: true
 
   cert-privkey:
+    name: ${CERT_PRIVKEY_NAME:-cert-privkey}
     external: true
