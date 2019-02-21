@@ -43,7 +43,7 @@ services:
         constraints:
           - node.role == manager
       restart_policy:
-        delay: 10s
+        delay: 3s
         window: 1m
       resources:
         limits:
