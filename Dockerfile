@@ -1,4 +1,4 @@
-FROM nginx:alpine
+FROM nginx:1.15-alpine
 
 LABEL maintainer="info@redmic.es"
 
