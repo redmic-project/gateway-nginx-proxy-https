@@ -1,56 +1,54 @@
 version: '3.5'
 
 services:
-  nginx-proxy:
-    image: ${IMAGE_NAME}:${IMAGE_TAG:-latest}
+  nginx-proxy-https:
+    image: ${IMAGE_NAME:-registry.gitlab.com/redmic-project/gateway/nginx-proxy-https}:${IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: ${DOCKERFILE:-Dockerfile}
+      args:
+        NGINX_IMAGE_TAG:
+        OPENSSL_VERSION:
     environment:
-      - PERSISTENT_PATH
+      PERSISTENT_PATH:
     networks:
-      - traefik-net
+      traefik-net:
     ports:
-      - target: 80
-        published: 80
-        mode: host
-      - target: 443
-        published: 443
-        mode: host
+      - target: ${HTTPS_INTERNAL_PORT}
+        published: ${HTTPS_PORT}
+        mode: ${PORT_MODE}
     volumes:
       - persistent-vol:${PERSISTENT_PATH}
       - cache-vol:/var/nginx/cache
-      - acme-vol:/var/www/html
     configs:
-      - source: blockips
+      - source: blockips-config
         target: /etc/nginx/conf.d/blockips.conf
-      - source: blacklist
+      - source: blacklist-config
         target: /etc/nginx/conf.d/blacklist.conf
     secrets:
-      - source: cert-chain
+      - source: cert-chain-secret
         target: /etc/nginx/certs/chain.pem
-      - source: cert-fullchain
+      - source: cert-fullchain-secret
         target: /etc/nginx/certs/fullchain.pem
-      - source: cert-privkey
+      - source: cert-privkey-secret
         target: /etc/nginx/certs/privkey.pem
-    healthcheck:
-      test: wget --spider http://${PUBLIC_HOSTNAME:-localhost} || (count=$$(ps aux | grep openssl | wc -l); [ $${count} -gt 1 ])
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 1m
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: ${REPLICAS:-1}
       placement:
         constraints:
           - node.role == manager
       restart_policy:
-        delay: 3s
-        window: 1m
+        delay: ${RESTART_DELAY:-0s}
+      update_config:
+        delay: ${UPDATE_DELAY:-1m}
       resources:
         limits:
-          cpus: '2'
-          memory: 128M
+          cpus: '${RESOURCES_LIMITS_CPUS:-2}'
+          memory: ${RESOURCES_LIMITS_MEMORY:-128M}
         reservations:
-          memory: 64M
+          cpus: '${RESOURCES_RESERVATIONS_CPUS:-0.001}'
+          memory: ${RESOURCES_RESERVATIONS_MEMORY:-32M}
 
 networks:
   traefik-net:
@@ -64,23 +62,20 @@ volumes:
   persistent-vol:
     name: ${PERSISTENT_VOL_NAME:-nginx-persistent-vol}
 
-  acme-vol:
-    name: ${ACME_VOL_NAME:-acme-vol}
-
 configs:
-  blockips:
-    name: ${BLOCKLIPS_NAME:-nginx-blockips}
+  blockips-config:
+    name: ${BLOCKIPS_CONFIG_NAME:-nginx-blockips}
     file: ./config/blockips.conf
 
 secrets:
-  cert-chain:
-    name: ${CERT_CHAIN_NAME:-cert-chain}
+  cert-chain-secret:
+    name: ${CERT_CHAIN_SECRET_NAME:-cert-chain}
     external: true
 
-  cert-fullchain:
-    name: ${CERT_FULLCHAIN_NAME:-cert-fullchain}
+  cert-fullchain-secret:
+    name: ${CERT_FULLCHAIN_SECRET_NAME:-cert-fullchain}
     external: true
 
-  cert-privkey:
-    name: ${CERT_PRIVKEY_NAME:-cert-privkey}
+  cert-privkey-secret:
+    name: ${CERT_PRIVKEY_SECRET_NAME:-cert-privkey}
     external: true
