@@ -7,7 +7,7 @@ LABEL maintainer="info@redmic.es"
 COPY nginx /etc/nginx
 COPY scripts/entrypoint.sh /entrypoint.sh
 
-ARG OPENSSL_VERSION=1.1.1a-r1
+ARG OPENSSL_VERSION=1.1.1d-r0
 RUN apk add --no-cache \
 	openssl=${OPENSSL_VERSION}
 
