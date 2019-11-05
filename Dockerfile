@@ -14,7 +14,7 @@ RUN apk add --no-cache \
 EXPOSE 443
 
 HEALTHCHECK --interval=30s --timeout=15s --start-period=1m --retries=10 \
-	CMD wget --spider -q https://localhost/nginx-health \
+	CMD wget --spider -q http://localhost/nginx-health \
 		|| (count=$(ps aux | grep openssl | wc -l); [ ${count} -gt 1 ]) \
 		|| exit 1
 
