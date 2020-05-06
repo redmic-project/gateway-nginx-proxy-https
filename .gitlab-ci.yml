@@ -5,6 +5,9 @@ include:
   - project: 'redmic-project/gitlab-ci-templates'
     ref: master
     file: '/deployment.yml'
+  - project: 'redmic-project/gitlab-ci-templates'
+    ref: master
+    file: '/deployment-custom-image.yml'
 
 stages:
   - package
