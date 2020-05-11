@@ -10,8 +10,9 @@ include:
     file: '/deployment-custom-image.yml'
 
 stages:
+  - pre-package
   - package
-  - test-package
+  - post-package
   - deploy
 
 variables:
