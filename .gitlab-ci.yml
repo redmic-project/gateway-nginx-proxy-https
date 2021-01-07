@@ -1,26 +1,13 @@
 include:
   - project: 'redmic-project/gitlab-ci-templates'
     ref: master
-    file: '/packaging.yml'
-  - project: 'redmic-project/gitlab-ci-templates'
-    ref: master
     file: '/deployment.yml'
-  - project: 'redmic-project/gitlab-ci-templates'
-    ref: master
-    file: '/deployment-custom-image.yml'
 
 stages:
-  - pre-package
-  - package
-  - post-package
   - deploy
-
-variables:
-  PROJECT_PARENT_NAME: gateway
 
 .deploy:
   variables:
-    STACK: ${PROJECT_PARENT_NAME}
-    SERVICES_TO_CHECK: ${PROJECT_PARENT_NAME}_${CI_PROJECT_NAME}
+    STACK: gateway
   environment:
     url: https://${PUBLIC_HOSTNAME}

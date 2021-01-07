@@ -2,15 +2,7 @@ version: '3.5'
 
 services:
   nginx-proxy-https:
-    image: ${IMAGE_NAME:-registry.gitlab.com/redmic-project/gateway/nginx-proxy-https}:${IMAGE_TAG:-latest}
-    build:
-      context: ..
-      dockerfile: ${DOCKERFILE:-Dockerfile}
-      args:
-        NGINX_IMAGE_TAG:
-        OPENSSL_VERSION:
-    environment:
-      PERSISTENT_PATH:
+    image: ${IMAGE_NAME:-nginx}:${IMAGE_TAG:-alpine}
     networks:
       traefik-net:
     ports:
@@ -18,7 +10,7 @@ services:
         published: ${HTTPS_PORT}
         mode: ${PORT_MODE}
     volumes:
-      - persistent-vol:${PERSISTENT_PATH}
+      - persistent-vol:/var/nginx/persistent
       - cache-vol:/var/nginx/cache
     configs:
       - source: blockips-config
@@ -32,6 +24,12 @@ services:
         target: /etc/nginx/certs/fullchain.pem
       - source: cert-privkey-secret
         target: /etc/nginx/certs/privkey.pem
+    healthcheck:
+      test: wget --spider -q http://localhost/nginx-health
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-15s}
+      retries: ${HEALTHCHECK_RETRIES:-10}
+      start_period: ${HEALTHCHECK_START_PERIOD:-1m}
     deploy:
       mode: replicated
       replicas: ${REPLICAS:-1}
@@ -61,7 +59,8 @@ volumes:
     name: ${CACHE_VOL_NAME:-nginx-cache-vol}
 
   persistent-vol:
-    name: ${PERSISTENT_VOL_NAME:-nginx-persistent-vol}
+    name: ${PERSISTENT_VOL_NAME:-dhparams-vol}
+    external: true
 
 configs:
   blockips-config:
