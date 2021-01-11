@@ -10,4 +10,4 @@ services:
 configs:
   blacklist-config:
     name: ${BLACKLIST_CONFIG_NAME}
-    file: ./config/pro-blacklist.conf
+    file: ./config/conf.d/pro-blacklist.conf
