@@ -15,17 +15,17 @@ services:
     configs:
       - source: nginx-config
         target: /etc/nginx/nginx.conf
-      - source: nginx-default-config
+      - source: default-config
         target: /etc/nginx/conf.d/default.conf
-      - source: nginx-gzip-config
+      - source: gzip-config
         target: /etc/nginx/conf.d/gzip.conf
-      - source: nginx-ssl-params-config
+      - source: ssl-params-config
         target: /etc/nginx/conf.d/ssl-params.conf
-      - source: nginx-ssl-certs-config
+      - source: ssl-certs-config
         target: /etc/nginx/conf.d/ssl-certs.conf
-      - source: nginx-server-cache-config
+      - source: server-cache-config
         target: /etc/nginx/conf.d/server-cache-definition.conf
-      - source: nginx-client-cache-config
+      - source: client-cache-config
         target: /etc/nginx/conf.d/client-cache-definition.conf
       - source: blockips-config
         target: /etc/nginx/conf.d/blockips.conf
