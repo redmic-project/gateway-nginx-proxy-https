@@ -1,16 +1,8 @@
-version: '3.5'
+version: '3.6'
 
 services:
   nginx-proxy-https:
-    image: ${IMAGE_NAME:-registry.gitlab.com/redmic-project/gateway/nginx-proxy-https}:${IMAGE_TAG:-latest}
-    build:
-      context: ..
-      dockerfile: ${DOCKERFILE:-Dockerfile}
-      args:
-        NGINX_IMAGE_TAG:
-        OPENSSL_VERSION:
-    environment:
-      PERSISTENT_PATH:
+    image: ${IMAGE_NAME:-nginx}:${IMAGE_TAG:-alpine}
     networks:
       traefik-net:
     ports:
@@ -18,13 +10,34 @@ services:
         published: ${HTTPS_PORT}
         mode: ${PORT_MODE}
     volumes:
-      - persistent-vol:${PERSISTENT_PATH}
-      - cache-vol:/var/nginx/cache
+      - persistent-vol:/var/nginx/persistent
+      - type: tmpfs
+        target: /var/nginx/cache
+        tmpfs:
+          size: 705000000
     configs:
+      - source: nginx-config
+        target: /etc/nginx/nginx.conf
+      - source: default-config
+        target: /etc/nginx/conf.d/default.conf
+      - source: gzip-config
+        target: /etc/nginx/conf.d/gzip.conf
+      - source: ssl-params-config
+        target: /etc/nginx/conf.d/ssl-params.conf
+      - source: ssl-certs-config
+        target: /etc/nginx/conf.d/ssl-certs.conf
+      - source: server-cache-config
+        target: /etc/nginx/conf.d/server-cache-definition.conf
+      - source: client-cache-config
+        target: /etc/nginx/conf.d/client-cache-definition.conf
       - source: blockips-config
         target: /etc/nginx/conf.d/blockips.conf
       - source: blacklist-config
         target: /etc/nginx/conf.d/blacklist.conf
+      - source: block-requests-config
+        target: /etc/nginx/snippets/block-bad-request.conf
+      - source: cache-usage-config
+        target: /etc/nginx/snippets/cache-usage.conf
     secrets:
       - source: cert-chain-secret
         target: /etc/nginx/certs/chain.pem
@@ -32,6 +45,12 @@ services:
         target: /etc/nginx/certs/fullchain.pem
       - source: cert-privkey-secret
         target: /etc/nginx/certs/privkey.pem
+    healthcheck:
+      test: wget --spider -q http://localhost/nginx-health
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-15s}
+      retries: ${HEALTHCHECK_RETRIES:-10}
+      start_period: ${HEALTHCHECK_START_PERIOD:-1m}
     deploy:
       mode: replicated
       replicas: ${REPLICAS:-1}
@@ -45,10 +64,10 @@ services:
       resources:
         limits:
           cpus: '${RESOURCES_LIMITS_CPUS:-1}'
-          memory: ${RESOURCES_LIMITS_MEMORY:-128M}
+          memory: ${RESOURCES_LIMITS_MEMORY:-800M}
         reservations:
           cpus: '${RESOURCES_RESERVATIONS_CPUS:-0.001}'
-          memory: ${RESOURCES_RESERVATIONS_MEMORY:-32M}
+          memory: ${RESOURCES_RESERVATIONS_MEMORY:-64M}
 
 networks:
   traefik-net:
@@ -57,16 +76,50 @@ networks:
     external: true
 
 volumes:
-  cache-vol:
-    name: ${CACHE_VOL_NAME:-nginx-cache-vol}
-
   persistent-vol:
-    name: ${PERSISTENT_VOL_NAME:-nginx-persistent-vol}
+    name: ${PERSISTENT_VOL_NAME:-dhparams-vol}
+    external: true
 
 configs:
+  nginx-config:
+    name: ${NGINX_CONFIG_NAME:-nginx-proxy-https-config}
+    file: ./config/nginx.conf
+
+  default-config:
+    name: ${NGINX_DEFAULT_CONFIG_NAME:-nginx-proxy-https-default-config}
+    file: ./config/conf.d/default.conf
+
+  gzip-config:
+    name: ${NGINX_GZIP_CONFIG_NAME:-nginx-proxy-https-gzip-config}
+    file: ./config/conf.d/gzip.conf
+
+  ssl-params-config:
+    name: ${NGINX_SSL_PARAMS_CONFIG_NAME:-nginx-proxy-https-ssl-params-config}
+    file: ./config/conf.d/ssl-params.conf
+
+  ssl-certs-config:
+    name: ${NGINX_SSL_CERTS_CONFIG_NAME:-nginx-proxy-https-ssl-certs-config}
+    file: ./config/conf.d/ssl-certs.conf
+
+  server-cache-config:
+    name: ${NGINX_SERVER_CACHE_CONFIG_NAME:-nginx-proxy-https-server-cache-config}
+    file: ./config/conf.d/server-cache-definition.conf
+
+  client-cache-config:
+    name: ${NGINX_CLIENT_CACHE_CONFIG_NAME:-nginx-proxy-https-client-cache-config}
+    file: ./config/conf.d/client-cache-definition.conf
+
   blockips-config:
     name: ${BLOCKIPS_CONFIG_NAME:-nginx-blockips}
-    file: ./config/blockips.conf
+    file: ./config/conf.d/blockips.conf
+
+  block-requests-config:
+    name: ${NGINX_BLOCK_REQUESTS_CONFIG_NAME:-nginx-proxy-https-block-requests-config}
+    file: ./config/snippets/block-bad-request.conf
+
+  cache-usage-config:
+    name: ${NGINX_CACHE_USAGE_CONFIG_NAME:-nginx-proxy-https-cache-usage-config}
+    file: ./config/snippets/cache-usage.conf
 
 secrets:
   cert-chain-secret:

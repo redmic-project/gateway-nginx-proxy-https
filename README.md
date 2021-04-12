@@ -8,7 +8,7 @@ Este servicio sirve de proxy inverso al frente de *Traefik*, para aportar funcio
 
 * Sustituye a Traefik (que actúa a nivel interno) como punto de entrada a los servicios web. Recibe peticiones para cualquier dominio, y las propaga para que sean resueltas por Traefik hacia los contenedores apropiados.
 
-* Sirve a través de HTTPS todos los servicios, que funcionan sobre HTTP localmente. Carga los certificados con la ayuda de [certificates-manager](https://gitlab.com/redmic-project/gateway/certificates-manager) y genera sus propios parámetros Diffie-Hellman cuando no los tiene disponibles (normalmente solo la primera vez, hay que tener paciencia porque es un proceso pesado).
+* Sirve a través de HTTPS todos los servicios, que funcionan sobre HTTP localmente. Carga los certificados y los parámetros Diffie-Hellman con la ayuda de [certificates-manager](https://gitlab.com/redmic-project/gateway/certificates-manager).
 
 * Comprime las respuestas a las peticiones con gzip, disminuyendo el tráfico de red.
 
@@ -16,21 +16,13 @@ Este servicio sirve de proxy inverso al frente de *Traefik*, para aportar funcio
 
 * Protege frente al acceso malicioso, por parte de bots o desde orígenes sospechosos. Toma la información de [mariusv/nginx-badbot-blocker](https://github.com/mariusv/nginx-badbot-blocker) para ello.
 
-## Variables
-
-Se pueden definir algunos valores variables al servicio web.
-
-| Variable | Descripción | Valor por defecto |
-|:-:|:-:|:-:|
-| PERSISTENT_PATH | Ruta interna al contenedor sobre la que se montará el volumen `persistent-vol`. | `/var/nginx/persistent` |
-
 ## Volúmenes
 
 Se definen diferentes volúmenes para lograr persistencia del servicio, al mismo tiempo que se mantienen separados ficheros de distinta índole.
 
 ### persistent-vol
 
-Almacena aquellos ficheros que no son secretos y que interesa conservar entre reinicios del servicio. Por ejemplo, los parámetros Diffie-Hellman.
+Almacena aquellos ficheros que no son secretos y que interesa conservar entre reinicios del servicio, como los parámetros Diffie-Hellman. Se trata de un volumen externo al servicio.
 
 ### cache-vol
 
