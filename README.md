@@ -1,6 +1,6 @@
 # Nginx proxy HTTPS
 
-Nginx service configured to act as a proxy to Traefik service. Add caching and bot protection capabilities
+Nginx service configured to act as a proxy to Traefik service. Add bot protection capabilities
 
 Este servicio sirve de proxy inverso al frente de *Traefik*, para aportar funciones de las que este último carece.
 
@@ -8,11 +8,9 @@ Este servicio sirve de proxy inverso al frente de *Traefik*, para aportar funcio
 
 * Sustituye a Traefik (que actúa a nivel interno) como punto de entrada a los servicios web. Recibe peticiones para cualquier dominio, y las propaga para que sean resueltas por Traefik hacia los contenedores apropiados.
 
-* Sirve a través de HTTPS todos los servicios, que funcionan sobre HTTP localmente. Carga los certificados y los parámetros Diffie-Hellman con la ayuda de [certificates-manager](https://gitlab.com/redmic-project/gateway/certificates-manager).
+* Sirve a través de HTTPS todos los servicios, que funcionan sobre HTTP (o HTTPS si es necesario) localmente. Carga los certificados y los parámetros Diffie-Hellman con la ayuda de [certificates-manager](https://gitlab.com/redmic-project/gateway/certificates-manager).
 
 * Comprime las respuestas a las peticiones con gzip, disminuyendo el tráfico de red.
-
-* Implementa un mecanismo de caché, configurable por subdominios, rutas, cabeceras, etc. Ayuda a reducir la carga de los servicios, devolviendo directamente respuestas que ya se han devuelto recientemente.
 
 * Protege frente al acceso malicioso, por parte de bots o desde orígenes sospechosos. Toma la información de [mariusv/nginx-badbot-blocker](https://github.com/mariusv/nginx-badbot-blocker) para ello.
 
@@ -24,13 +22,13 @@ Se definen diferentes volúmenes para lograr persistencia del servicio, al mismo
 
 Almacena aquellos ficheros que no son secretos y que interesa conservar entre reinicios del servicio, como los parámetros Diffie-Hellman. Se trata de un volumen externo al servicio.
 
-### cache-vol
-
-Conserva los ficheros de caché generados durante el funcionamiento del servidor web. Para limpiar la caché, es posible reiniciar el servicio tras borrar este volumen, y se volverá a regenerar de nuevo sin inconvenientes.
-
 ## Configuraciones
 
 Para poder contemplar varios casos de uso (según entorno de despliegue, por ejemplo) se definen configs de Docker, estáticas para el servicio pero que permiten mayor flexibilidad.
+
+### default
+
+Define los servers que darán el servicio.
 
 ### blockips
 
@@ -39,6 +37,22 @@ Contiene un listado de IP que deben bloquearse siempre. Procede originalmente de
 ### blacklist
 
 Define aquellos agentes (para identificar bots), dominios y URL que deben ser bloqueados. Procede originalmente de <https://github.com/mariusv/nginx-badbot-blocker/blob/master/blacklist.conf>, pero ha sido ampliado y es posible editarlo. Por ejemplo, para bloquear bots de rastreo o para conceder acceso a un agente concreto.
+
+### block-requests
+
+Aplica los bloqueos configurados desde blacklist.
+
+### ssl-params
+
+Provee los parámetros relativos al uso de certificados.
+
+### ssl-certs
+
+Provee la importación de los certificados para su uso.
+
+### gzip
+
+Mantiene una relación de extensiones a comprimir y los parámetros usados para ello.
 
 ## Secretos
 
