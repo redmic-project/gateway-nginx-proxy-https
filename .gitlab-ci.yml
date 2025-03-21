@@ -1,7 +1,7 @@
 include:
   - project: 'redmic-project/gitlab-ci-templates'
     ref: master
-    file: '/deployment.yml'
+    file: '/deployment-service/docker-deploy.yml'
 
 stages:
   - deploy
@@ -9,5 +9,3 @@ stages:
 .deploy:
   variables:
     STACK: gateway
-  environment:
-    url: https://${PUBLIC_HOSTNAME}

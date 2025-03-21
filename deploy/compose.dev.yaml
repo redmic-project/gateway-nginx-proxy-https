@@ -1,5 +1,3 @@
-version: '3.5'
-
 services:
   nginx-proxy-https:
     deploy:
@@ -8,6 +6,6 @@ services:
           - node.labels.${PLACEMENT_CONSTRAINTS_NODE_LABELS_NAME:-gateway} == ${PLACEMENT_CONSTRAINTS_NODE_LABELS_VALUE:-true}
 
 configs:
-  blacklist-config:
-    name: ${BLACKLIST_CONFIG_NAME}
-    file: ./config/conf.d/dev-blacklist.conf
+  redirect-redmic-config:
+    name: ${REDIRECT_REDMIC_CONFIG_NAME}
+    file: ./config/conf.d/dev-redirect-redmic.conf
