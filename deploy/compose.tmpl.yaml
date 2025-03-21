@@ -24,6 +24,10 @@ services:
         target: /etc/nginx/conf.d/blacklist.conf
       - source: block-requests-config
         target: /etc/nginx/snippets/block-bad-request.conf
+      - source: redirect-redmic-config
+        target: /etc/nginx/conf.d/redirect-redmic.conf
+      - source: redirect-ecomarcan-config
+        target: /etc/nginx/conf.d/redirect-ecomarcan.conf
     secrets:
       - source: cert-chain-secret
         target: /etc/nginx/certs/chain.pem
@@ -90,6 +94,10 @@ configs:
   block-requests-config:
     name: ${NGINX_BLOCK_REQUESTS_CONFIG_NAME:-nginx-proxy-https-block-requests-config}
     file: ./config/snippets/block-bad-request.conf
+
+  redirect-ecomarcan-config:
+    name: ${REDIRECT_ECOMARCAN_CONFIG_NAME:-nginx-proxy-https-redirect-ecomarcan-config}
+    file: ./config/conf.d/redirect-ecomarcan.conf
 
 secrets:
   cert-chain-secret:
