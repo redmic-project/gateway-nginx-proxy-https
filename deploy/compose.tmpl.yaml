@@ -18,12 +18,6 @@ services:
         target: /etc/nginx/conf.d/ssl-params.conf
       - source: ssl-certs-config
         target: /etc/nginx/conf.d/ssl-certs.conf
-      - source: blockips-config
-        target: /etc/nginx/conf.d/blockips.conf
-      - source: blacklist-config
-        target: /etc/nginx/conf.d/blacklist.conf
-      - source: block-requests-config
-        target: /etc/nginx/snippets/block-bad-request.conf
       - source: redirect-redmic-config
         target: /etc/nginx/conf.d/redirect-redmic.conf
       - source: redirect-ecomarcan-config
@@ -86,14 +80,6 @@ configs:
   ssl-certs-config:
     name: ${NGINX_SSL_CERTS_CONFIG_NAME:-nginx-proxy-https-ssl-certs-config}
     file: ./config/conf.d/ssl-certs.conf
-
-  blockips-config:
-    name: ${BLOCKIPS_CONFIG_NAME:-nginx-blockips}
-    file: ./config/conf.d/blockips.conf
-
-  block-requests-config:
-    name: ${NGINX_BLOCK_REQUESTS_CONFIG_NAME:-nginx-proxy-https-block-requests-config}
-    file: ./config/snippets/block-bad-request.conf
 
   redirect-ecomarcan-config:
     name: ${REDIRECT_ECOMARCAN_CONFIG_NAME:-nginx-proxy-https-redirect-ecomarcan-config}
