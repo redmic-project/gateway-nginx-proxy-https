@@ -1,9 +1,9 @@
-services:
-  nginx-proxy-https:
-    deploy:
-      placement:
-        constraints:
-          - engine.labels.availability_zone == ${AWS_REGION}a
+volumes:
+  persistent-vol:
+    name: ${PERSISTENT_VOL_NAME}
+    driver: ${PRO_VOL_DRIVER:-cloudstor:aws}
+    driver_opts:
+      backing: shared
 
 configs:
   redirect-redmic-config:

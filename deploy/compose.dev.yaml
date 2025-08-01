@@ -1,9 +1,11 @@
-services:
-  nginx-proxy-https:
-    deploy:
-      placement:
-        constraints:
-          - node.labels.${PLACEMENT_CONSTRAINTS_NODE_LABELS_NAME:-gateway} == ${PLACEMENT_CONSTRAINTS_NODE_LABELS_VALUE:-true}
+volumes:
+  persistent-vol:
+    name: ${PERSISTENT_VOL_NAME}
+    driver: ${DEV_VOL_DRIVER:-local}
+    driver_opts:
+      type: ${VOL_TYPE:-nfs}
+      o: addr=${VOL_ADDR:-127.0.0.1},vers=${VOL_VERS:-4.2},${VOL_OPTS:-nolock,noacl,noatime,nodiratime}
+      device: :${VOL_DEVICE_PREFIX}${PERSISTENT_VOL_DEVICE:-/dhparams-vol/}
 
 configs:
   redirect-redmic-config:

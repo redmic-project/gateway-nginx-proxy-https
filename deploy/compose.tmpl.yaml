@@ -40,7 +40,7 @@ services:
       replicas: ${REPLICAS:-1}
       placement:
         constraints:
-          - node.role == manager
+          - ${PLACEMENT_CONSTRAINTS_NAME:-node.labels.gateway} ${PLACEMENT_CONSTRAINTS_OPERATOR:-==} ${PLACEMENT_CONSTRAINTS_VALUE:-true}
       restart_policy:
         delay: ${RESTART_DELAY:-0s}
       update_config:
@@ -57,11 +57,6 @@ networks:
   traefik-net:
     name: ${TRAEFIK_NET_NAME:-traefik-net}
     driver: ${TRAEFIK_NET_DRIVER:-overlay}
-    external: true
-
-volumes:
-  persistent-vol:
-    name: ${PERSISTENT_VOL_NAME:-dhparams-vol}
     external: true
 
 configs:
