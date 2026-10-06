@@ -22,6 +22,8 @@ services:
         target: /etc/nginx/conf.d/redirect-redmic.conf
       - source: redirect-ecomarcan-config
         target: /etc/nginx/conf.d/redirect-ecomarcan.conf
+      - source: access-log-config
+        target: /etc/nginx/conf.d/00-access-log.conf
     secrets:
       - source: cert-chain-secret
         target: /etc/nginx/certs/chain.pem
@@ -79,6 +81,10 @@ configs:
   redirect-ecomarcan-config:
     name: ${REDIRECT_ECOMARCAN_CONFIG_NAME:-nginx-proxy-https-redirect-ecomarcan-config}
     file: ./config/conf.d/redirect-ecomarcan.conf
+
+  access-log-config:
+    name: ${NGINX_ACCESS_LOG_CONFIG_NAME:-nginx-proxy-https-access-log-config}
+    file: ./config/conf.d/access-log.conf
 
 secrets:
   cert-chain-secret:
