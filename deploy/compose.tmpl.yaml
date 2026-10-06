@@ -84,7 +84,7 @@ configs:
 
   access-log-config:
     name: ${NGINX_ACCESS_LOG_CONFIG_NAME:-nginx-proxy-https-access-log-config}
-    file: ./config/conf.d/access-log.conf
+    file: ./config/conf.d/00-access-log.conf
 
 secrets:
   cert-chain-secret:
