@@ -6,5 +6,5 @@ volumes:
       backing: shared
 
 configs:
-  nginx-proxy-https-redirect-redmic-config:
+  nginx-proxy-https-redirect-redmic:
     file: ./config/conf.d/pro-redirect-redmic.conf

@@ -11,20 +11,22 @@ services:
       - persistent-vol:/var/nginx/persistent
       - accesslog-vol:/var/log/nginx/access
     configs:
-      - source: nginx-proxy-https-default-config
+      - source: nginx-proxy-https-default
         target: /etc/nginx/conf.d/default.conf
-      - source: nginx-proxy-https-gzip-config
+      - source: nginx-proxy-https-gzip
         target: /etc/nginx/conf.d/gzip.conf
-      - source: nginx-proxy-https-ssl-params-config
+      - source: nginx-proxy-https-ssl-params
         target: /etc/nginx/conf.d/ssl-params.conf
-      - source: nginx-proxy-https-ssl-certs-config
+      - source: nginx-proxy-https-ssl-certs
         target: /etc/nginx/conf.d/ssl-certs.conf
-      - source: nginx-proxy-https-redirect-redmic-config
+      - source: nginx-proxy-https-redirect-redmic
         target: /etc/nginx/conf.d/redirect-redmic.conf
-      - source: nginx-proxy-https-redirect-ecomarcan-config
+      - source: nginx-proxy-https-redirect-ecomarcan
         target: /etc/nginx/conf.d/redirect-ecomarcan.conf
-      - source: nginx-proxy-https-access-log-config
+      - source: nginx-proxy-https-access-log
         target: /etc/nginx/conf.d/00-access-log.conf
+      - source: nginx-proxy-https-rotate-access-log
+        target: /etc/logrotate.d/access-log
     secrets:
       - source: cert-chain-secret
         target: /etc/nginx/certs/chain.pem
@@ -66,23 +68,26 @@ volumes:
     driver: ${VOL_DRIVER:-local}
 
 configs:
-  nginx-proxy-https-default-config:
+  nginx-proxy-https-default:
     file: ./config/conf.d/default.conf
 
-  nginx-proxy-https-gzip-config:
+  nginx-proxy-https-gzip:
     file: ./config/conf.d/gzip.conf
 
-  nginx-proxy-https-ssl-params-config:
+  nginx-proxy-https-ssl-params:
     file: ./config/conf.d/ssl-params.conf
 
-  nginx-proxy-https-ssl-certs-config:
+  nginx-proxy-https-ssl-certs:
     file: ./config/conf.d/ssl-certs.conf
 
-  nginx-proxy-https-redirect-ecomarcan-config:
+  nginx-proxy-https-redirect-ecomarcan:
     file: ./config/conf.d/redirect-ecomarcan.conf
 
-  nginx-proxy-https-access-log-config:
+  nginx-proxy-https-access-log:
     file: ./config/conf.d/00-access-log.conf
+
+  nginx-proxy-https-rotate-access-log:
+    file: ./config/logrotate.d/access-log
 
 secrets:
   cert-chain-secret:

@@ -7,5 +7,5 @@ volumes:
       device: :${VOL_DEVICE_PREFIX}${PERSISTENT_VOL_DEVICE:-/dhparams-vol/}
 
 configs:
-  nginx-proxy-https-redirect-redmic-config:
+  nginx-proxy-https-redirect-redmic:
     file: ./config/conf.d/dev-redirect-redmic.conf
