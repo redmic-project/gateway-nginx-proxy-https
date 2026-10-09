@@ -4,25 +4,26 @@ services:
     networks:
       traefik-net:
     ports:
-      - target: ${HTTPS_INTERNAL_PORT}
-        published: ${HTTPS_PORT}
-        mode: ${PORT_MODE}
+      - target: ${HTTPS_INTERNAL_PORT:-443}
+        published: ${HTTPS_PORT:-443}
+        mode: ${PORT_MODE:-host}
     volumes:
       - persistent-vol:/var/nginx/persistent
+      - accesslog-vol:/var/log/nginx/access
     configs:
-      - source: default-config
+      - source: nginx-proxy-https-default-config
         target: /etc/nginx/conf.d/default.conf
-      - source: gzip-config
+      - source: nginx-proxy-https-gzip-config
         target: /etc/nginx/conf.d/gzip.conf
-      - source: ssl-params-config
+      - source: nginx-proxy-https-ssl-params-config
         target: /etc/nginx/conf.d/ssl-params.conf
-      - source: ssl-certs-config
+      - source: nginx-proxy-https-ssl-certs-config
         target: /etc/nginx/conf.d/ssl-certs.conf
-      - source: redirect-redmic-config
+      - source: nginx-proxy-https-redirect-redmic-config
         target: /etc/nginx/conf.d/redirect-redmic.conf
-      - source: redirect-ecomarcan-config
+      - source: nginx-proxy-https-redirect-ecomarcan-config
         target: /etc/nginx/conf.d/redirect-ecomarcan.conf
-      - source: access-log-config
+      - source: nginx-proxy-https-access-log-config
         target: /etc/nginx/conf.d/00-access-log.conf
     secrets:
       - source: cert-chain-secret
@@ -42,7 +43,7 @@ services:
       replicas: ${REPLICAS:-1}
       placement:
         constraints:
-          - ${PLACEMENT_CONSTRAINTS_NAME:-node.labels.gateway} ${PLACEMENT_CONSTRAINTS_OPERATOR:-==} ${PLACEMENT_CONSTRAINTS_VALUE:-true}
+          - ${PLACEMENT_CONSTRAINT_NODE_LABEL:-node.labels.gateway==true}
       restart_policy:
         delay: ${RESTART_DELAY:-0s}
       update_config:
@@ -58,32 +59,29 @@ services:
 networks:
   traefik-net:
     name: ${TRAEFIK_NET_NAME:-traefik-net}
-    driver: ${TRAEFIK_NET_DRIVER:-overlay}
     external: true
 
+volumes:
+  accesslog-vol:
+    driver: ${VOL_DRIVER:-local}
+
 configs:
-  default-config:
-    name: ${NGINX_DEFAULT_CONFIG_NAME:-nginx-proxy-https-default-config}
+  nginx-proxy-https-default-config:
     file: ./config/conf.d/default.conf
 
-  gzip-config:
-    name: ${NGINX_GZIP_CONFIG_NAME:-nginx-proxy-https-gzip-config}
+  nginx-proxy-https-gzip-config:
     file: ./config/conf.d/gzip.conf
 
-  ssl-params-config:
-    name: ${NGINX_SSL_PARAMS_CONFIG_NAME:-nginx-proxy-https-ssl-params-config}
+  nginx-proxy-https-ssl-params-config:
     file: ./config/conf.d/ssl-params.conf
 
-  ssl-certs-config:
-    name: ${NGINX_SSL_CERTS_CONFIG_NAME:-nginx-proxy-https-ssl-certs-config}
+  nginx-proxy-https-ssl-certs-config:
     file: ./config/conf.d/ssl-certs.conf
 
-  redirect-ecomarcan-config:
-    name: ${REDIRECT_ECOMARCAN_CONFIG_NAME:-nginx-proxy-https-redirect-ecomarcan-config}
+  nginx-proxy-https-redirect-ecomarcan-config:
     file: ./config/conf.d/redirect-ecomarcan.conf
 
-  access-log-config:
-    name: ${NGINX_ACCESS_LOG_CONFIG_NAME:-nginx-proxy-https-access-log-config}
+  nginx-proxy-https-access-log-config:
     file: ./config/conf.d/00-access-log.conf
 
 secrets:

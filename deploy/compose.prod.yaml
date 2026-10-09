@@ -1,11 +1,10 @@
 volumes:
   persistent-vol:
-    name: ${PERSISTENT_VOL_NAME}
+    name: ${PERSISTENT_VOL_NAME:-dhparams-vol}
     driver: ${PRO_VOL_DRIVER:-cloudstor:aws}
     driver_opts:
       backing: shared
 
 configs:
-  redirect-redmic-config:
-    name: ${REDIRECT_REDMIC_CONFIG_NAME}
+  nginx-proxy-https-redirect-redmic-config:
     file: ./config/conf.d/pro-redirect-redmic.conf
