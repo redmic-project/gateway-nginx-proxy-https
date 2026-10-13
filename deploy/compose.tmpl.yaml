@@ -23,8 +23,6 @@ services:
         target: /etc/nginx/conf.d/redirect-redmic.conf
       - source: nginx-proxy-https-redirect-ecomarcan
         target: /etc/nginx/conf.d/redirect-ecomarcan.conf
-      - source: nginx-proxy-https-access-log
-        target: /etc/nginx/conf.d/00-access-log.conf
       - source: nginx-proxy-https-rotate-access-log
         target: /etc/logrotate.d/access-log
     secrets:
@@ -82,9 +80,6 @@ configs:
 
   nginx-proxy-https-redirect-ecomarcan:
     file: ./config/conf.d/redirect-ecomarcan.conf
-
-  nginx-proxy-https-access-log:
-    file: ./config/conf.d/00-access-log.conf
 
   nginx-proxy-https-rotate-access-log:
     file: ./config/logrotate.d/access-log
