@@ -48,9 +48,9 @@ Mantiene una relación de extensiones a comprimir y los parámetros usados para 
 
 Varios ficheros de configuración que albergan reglas de redirección entre dominios.
 
-### rotate-access-log
+### access-log
 
-Rota los ficheros presentes en el subdirectorio `/var/log/nginx/access` (mapeado con volumen) con la misma configuración de rotado que el original.
+Define una estructura de salida para los logs de acceso.
 
 ## Secretos
 
