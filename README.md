@@ -52,7 +52,6 @@ Varios ficheros de configuración que albergan reglas de redirección entre domi
 
 Define una estructura de salida para los logs de acceso.
 
-
 ## Secretos
 
 Del mismo modo que con las configs, se usan secrets de Docker para almacenar aquellas configuraciones que además no deben ser públicas.
