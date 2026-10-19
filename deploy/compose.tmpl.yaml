@@ -68,7 +68,7 @@ services:
     networks:
       metric-net:
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
     deploy:
       mode: replicated
       replicas: 0
