@@ -58,6 +58,7 @@ services:
 
   nginx-cron:
     image: ${CRON_IMAGE_NAME:-registry.gitlab.com/redmic-project/docker/swarm-service-exec}:${CRON_IMAGE_TAG:-latest}
+    hostname: nginx-cron-{{.Node.Hostname}}
     environment:
       TARGET_SERVICE: ${STACK}_nginx-proxy-https
       COMMAND: >-
