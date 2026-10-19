@@ -64,8 +64,6 @@ services:
         echo "Rotating nginx access log...";
         mv /var/log/nginx/access/access.json /var/log/nginx/access/access.json.0;
         kill -USR1 `cat /var/run/nginx.pid`;
-      PUSHGATEWAY_HOST:
-      PUSHGATEWAY_JOB:
     networks:
       metric-net:
     volumes:
@@ -74,6 +72,7 @@ services:
       mode: replicated
       replicas: 0
       placement:
+        max_replicas_per_node: 1
         constraints:
           - ${PLACEMENT_CONSTRAINT_NODE_LABEL}
       restart_policy:
