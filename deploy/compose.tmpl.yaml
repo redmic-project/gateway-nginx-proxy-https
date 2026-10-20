@@ -25,8 +25,6 @@ services:
         target: /etc/nginx/conf.d/redirect-ecomarcan.conf
       - source: nginx-proxy-https-access-log
         target: /etc/nginx/conf.d/00-access-log.conf
-      - source: nginx-proxy-https-rotate-access-log
-        target: /etc/logrotate.d/access-log
     secrets:
       - source: cert-chain-secret
         target: /etc/nginx/certs/chain.pem
@@ -45,7 +43,7 @@ services:
       replicas: ${REPLICAS:-1}
       placement:
         constraints:
-          - ${PLACEMENT_CONSTRAINT_NODE_LABEL:-node.labels.gateway==true}
+          - ${PLACEMENT_CONSTRAINT_NODE_LABEL}
       restart_policy:
         delay: ${RESTART_DELAY:-0s}
       update_config:
@@ -58,9 +56,40 @@ services:
           cpus: '${RESOURCES_RESERVATIONS_CPUS:-0.001}'
           memory: ${RESOURCES_RESERVATIONS_MEMORY:-32M}
 
+  nginx-cron:
+    image: ${CRON_IMAGE_NAME:-registry.gitlab.com/redmic-project/docker/swarm-service-exec}:${CRON_IMAGE_TAG:-latest}
+    hostname: nginx-cron-{{.Node.Hostname}}
+    environment:
+      TARGET_SERVICE: ${STACK}_nginx-proxy-https
+      COMMAND: >-
+        echo "Rotating nginx access log...";
+        mv /var/log/nginx/access/access.json /var/log/nginx/access/access.json.0;
+        kill -USR1 `cat /var/run/nginx.pid`;
+    networks:
+      metric-net:
+    volumes:
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+    deploy:
+      mode: replicated
+      replicas: 0
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - ${PLACEMENT_CONSTRAINT_NODE_LABEL}
+      restart_policy:
+        condition: none
+      labels:
+        swarm.cronjob.enable: 'true'
+        swarm.cronjob.schedule: '0 0 * * *'
+        swarm.cronjob.skip-running: 'true'
+
 networks:
   traefik-net:
     name: ${TRAEFIK_NET_NAME:-traefik-net}
+    external: true
+
+  metric-net:
+    name: ${METRIC_NET_NAME:-metric-net}
     external: true
 
 volumes:
@@ -85,9 +114,6 @@ configs:
 
   nginx-proxy-https-access-log:
     file: ./config/conf.d/00-access-log.conf
-
-  nginx-proxy-https-rotate-access-log:
-    file: ./config/logrotate.d/access-log
 
 secrets:
   cert-chain-secret:

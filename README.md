@@ -52,10 +52,6 @@ Varios ficheros de configuración que albergan reglas de redirección entre domi
 
 Define una estructura de salida para los logs de acceso.
 
-### rotate-access-log
-
-Rota los ficheros `json` presentes en el subdirectorio `/var/log/nginx/access` (mapeado con volumen) con la misma configuración de rotado que el original.
-
 ## Secretos
 
 Del mismo modo que con las configs, se usan secrets de Docker para almacenar aquellas configuraciones que además no deben ser públicas.
